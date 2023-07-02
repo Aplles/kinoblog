@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Главная страница{% endblock title %}
+
+{% block content %}
+    <div class="main-container">
+
+        <div class="card-group">
+            {% for post in posts %}
+                <div class="card">
+                    <div class="left-container">
+                        1
+                    </div>
+                    <div class="right-container">
+                        2
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock content %}
