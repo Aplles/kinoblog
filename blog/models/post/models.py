@@ -29,12 +29,12 @@ class Post(models.Model):
         related_name='posts_author'
     )
     tags = models.ManyToManyField('Tag', verbose_name='Теги')
-    directors = models.ManyToManyField('Director', verbose_name='Режисеры')
+    directors = models.ManyToManyField('Director', verbose_name='Режисcеры')
 
     def __str__(self):
         return f'{self.title} {self.author}'
 
     class Meta:
-        db_table = 'post'
+        db_table = 'posts'
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
