@@ -1,17 +1,36 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Главная страница{% endblock title %}
 
 {% block content %}
     <div class="main-container">
 
-        <div class="card-group">
+        <div class="row">
             {% for post in posts %}
-                <div class="card">
-                    <div class="left-container">
-                        1
-                    </div>
-                    <div class="right-container">
-                        2
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="left-container">
+                            <div class="image-post">
+                                <img src="{% static 'img/test.jpg' %}" alt="">
+                            </div>
+                        </div>
+                        <div class="right-container">
+                            <div>
+                                <h2>Заголовок</h2>
+                            </div>
+                            <div>
+                                <p>Теги</p>
+                            </div>
+                            <div>
+                                <p>Описание</p>
+                            </div>
+                            <div>
+                                Автор поста
+                            </div>
+                            <div>
+                                Режисеры
+                            </div>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
