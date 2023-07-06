@@ -11,6 +11,6 @@ class Director(models.Model):
         return f'{self.first_name} {self.last_name}'
 
     class Meta:
-        db_table = 'director'
+        db_table = 'directors'
         verbose_name = 'Режисер'
         verbose_name_plural = 'Режисеры'
