@@ -31,6 +31,9 @@ class Post(models.Model):
     tags = models.ManyToManyField('Tag', verbose_name='Теги')
     directors = models.ManyToManyField('Director', verbose_name='Режисcеры')
 
+    def image(self):
+        return self.images.get(current=True).image.url
+
     def __str__(self):
         return f'{self.title} {self.author}'
 
