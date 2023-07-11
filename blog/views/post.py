@@ -42,3 +42,24 @@ class PostCreateView(View):
         post.tags.set(tags)
         post.directors.set(directors)
         return redirect("index")
+    
+
+class PostDetailView(View):
+    ''' Детальное отображение поста '''
+
+    def get(self, request, *args, **kwargs):
+        post = Post.objects.get(id=kwargs['id'])
+        return render(
+            request,
+            'detail.html',
+            context={'post':post}
+        )
+    
+
+class PostDeleteView(View):
+    ''' удаление поста '''
+
+    def post(self, request, *args, **kwargs):
+        post = Post.objects.get(id=kwargs['id'])        
+        post.delete()
+        return redirect("index")

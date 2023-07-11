@@ -38,6 +38,7 @@ class PostAddForm(forms.ModelForm):
             'title',
             'description',
             'status',
+            'year',
             'tags',
             'directors',
         )

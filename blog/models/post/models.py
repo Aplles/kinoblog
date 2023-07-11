@@ -23,6 +23,7 @@ class Post(models.Model):
         choices=STATUS,
         default=DRAFT
     )
+    year = models.IntegerField(verbose_name='Год выпуска')
     author = models.ForeignKey(
         'User',
         on_delete=models.CASCADE,
