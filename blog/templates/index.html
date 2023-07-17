@@ -14,35 +14,47 @@
                                 <img src="{{ post.image }}" alt="">
                             </div>
                         </div>
+
+
                         <div class="right-container">
                             <div>
                                 <h4>{{ post.title }}</h4>
                             </div>
+
                             <div class="block-year">
-                                {{ post.year }}
+                                Год выпуска:
+                                <h6>
+                                    {{ post.year }}
+                                </h6>
                             </div>
+
                             <div class="block-tags">
                                 {% for tag in post.tags.all %}
                                     {{ tag.title }},
                                 {% endfor %}
                             </div>
 
-                            <div>
-                                Автор поста:
-                                {{ post.author }}                                
-                            </div>
-
-                            <div>
-                                Режисеры:
+                            <div class="block-directors">                                
+                                Режиссеры:
                                 {% for director in post.directors.all %}
-                                    {{ director.first_name }}
-                                    {{ director.last_name }}
-                                    ,
-                                {% endfor %}
-
+                                    <h6>
+                                        {{ director.first_name }} 
+                                        {{ director.last_name }} 
+                                        {{ director.country }},
+                                    </h6>
+                                {% endfor %}                                 
                             </div>
+
+                            <div class="created-at">
+                                Дата создания:
+                                <h6>
+                                    {{ post.updated_at}}
+                                </h6> 
+                            </div>
+
+                            
                             <div class="button-detail">
-                                <a href="{% url "detail" post.id %}" ">Подробнее</a>
+                                <a href="{{ post.get_absolute_url }}">Подробнее</a>
                             </div>                            
                         </div>
                     </div>

@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from django.db import models
+from django.urls import reverse
 
 
 class Post(models.Model):
@@ -37,6 +38,9 @@ class Post(models.Model):
 
     def __str__(self):
         return f'{self.title} {self.author}'
+    
+    def get_absolute_url(self):
+        return reverse('detail', kwargs={'slug_post': self.slug})
 
     class Meta:
         db_table = 'posts'

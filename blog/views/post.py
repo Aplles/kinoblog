@@ -48,7 +48,7 @@ class PostDetailView(View):
     ''' Детальное отображение поста '''
 
     def get(self, request, *args, **kwargs):
-        post = Post.objects.get(id=kwargs['id'])
+        post = Post.objects.get(slug=kwargs['slug_post'])
         return render(
             request,
             'detail.html',
@@ -63,3 +63,6 @@ class PostDeleteView(View):
         post = Post.objects.get(id=kwargs['id'])        
         post.delete()
         return redirect("index")
+    
+
+
