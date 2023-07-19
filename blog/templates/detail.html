@@ -13,14 +13,7 @@
 
     <div class="block-tags">
         {% for tag in post.tags.all %}
-            {{ tag.title }}
-        {% endfor %}
-    </div>
-    <br>
-
-    <div class="block-tags">
-        {% for tag in post.tags.all %}
-            {{ tag.title }},        
+            {{ tag.title }},
         {% endfor %}
     </div>
     <br>
@@ -90,6 +83,10 @@
         </form>
     </div>
 
+    <div class="error">
+        {{error}}
+    </div>
+    
     <div class="comment">
         {% for comment in post.comments_post.all %}
             <div class="comment-display">

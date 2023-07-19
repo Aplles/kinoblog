@@ -18,11 +18,16 @@
     <div>
         <div>КиноБлог</div>
     </div>
-    <div class="list-links">
-        <div class="link-item"><a href="{% url 'create' %}">Добавить статью</a></div>
+    <div class="list-links">        
         {% if not request.user.is_authenticated %}
             <div class="link-item"><a href="{% url 'login' %}">Войти</a></div>
-        {% else %}
+            
+        {% elif request.user.is_staff %}
+            <div class="link-item"><a href="{% url 'create' %}">Добавить статью</a></div>
+            <div class="link-item"><a href="{% url 'logout' %}">Выйти</a></div>
+            <div class="link-item">{{ request.user.username }}</div>
+
+        {% else %}            
             <div class="link-item"><a href="{% url 'logout' %}">Выйти</a></div>
             <div class="link-item">{{ request.user.username }}</div>
         {% endif %}

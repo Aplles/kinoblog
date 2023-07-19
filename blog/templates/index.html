@@ -3,6 +3,21 @@
 {% block title %}Главная страница{% endblock title %}
 
 {% block content %}
+    <div class="filters-tags">
+        <form action="{% url 'filter_by_tag' %}" method="post">
+            {% csrf_token %}            
+            {% for tag in tags %}
+            <label>
+                <input type="checkbox" name="filter" value="{{tag.id}}">
+                {{ tag.title }}
+            </label>            
+            <br>
+        {% endfor %}
+        <button type="submit">Отфильтровать</button>
+        </form>
+        
+    </div>
+
     <div class="main-container">
 
         <div class="row">

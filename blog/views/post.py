@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from django.utils.text import slugify
+from pytils.translit import slugify
 from django.views import View
 
 from blog.forms import PostAddForm
 from blog.models import Post, Tag, Director
+from django.contrib.auth.models import AnonymousUser
 
 
 class PostListView(View):
@@ -11,14 +12,21 @@ class PostListView(View):
     def get(self, request, *args, **kwargs):
         posts = Post.objects.filter(status=Post.PUBLISHED).order_by(
             '-updated_at')
+        
+        tags = Tag.objects.all()
+
         return render(request, 'index.html', context={
-            'posts': posts
+            'posts': posts,
+            'tags': tags,
         })
 
 
 class PostCreateView(View):
 
     def get(self, request):
+        if not request.user.is_staff:
+            return redirect("index")
+
         return render(request, 'create.html', context={
             'form': PostAddForm()
         })
@@ -27,10 +35,14 @@ class PostCreateView(View):
         post = Post.objects.create(
             title=request.POST['title'],
             description=request.POST['description'],
+            year=request.POST['year'],
             status=request.POST['status'],
             author=request.user,
             slug=slugify(request.POST['title'])
         )
+        print(request.POST['title'])
+        print(slugify(request.POST['title']))
+
         tags = [Tag.objects.get(id=tag_id) for tag_id in request.POST.getlist('tags')]
         # tags = []
         # for tag_id in request.POST.getlist('tags'):
@@ -48,6 +60,9 @@ class PostDetailView(View):
     ''' Детальное отображение поста '''
 
     def get(self, request, *args, **kwargs):
+        if not Post.objects.filter(slug=kwargs['slug_post']):
+            return redirect("index")
+
         post = Post.objects.get(slug=kwargs['slug_post'])
         return render(
             request,
@@ -63,6 +78,30 @@ class PostDeleteView(View):
         post = Post.objects.get(id=kwargs['id'])        
         post.delete()
         return redirect("index")
+    
+
+class PostFilterView(View):
+    '''вывод постов по тегу'''
+
+    def post(self, request, *args, **kwargs):    
+        print("11111")
+
+        tags_id = request.GET.getlist('filter')
+
+        print("22222")
+
+        posts = Post.objects.filter(tags__id__in=tags_id)
+
+        print("333333")
+
+        print('tags_id:', tags_id )
+        print('posts:', posts )
+
+        return render(request, 'index.html', context={
+            'posts': posts,
+            'tags': Tag.objects.all(),
+        })
+
     
 
 

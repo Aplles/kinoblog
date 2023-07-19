@@ -1,7 +1,7 @@
 from django.db import models
 
 class Comment(models.Model):
-    title = models.CharField(max_length=100, verbose_name='Заголовок')    
+    title = models.TextField(verbose_name='Заголовок')    
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата создания'
