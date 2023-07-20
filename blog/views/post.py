@@ -14,10 +14,12 @@ class PostListView(View):
             '-updated_at')
         
         tags = Tag.objects.all()
+        directors = Director.objects.all()
 
         return render(request, 'index.html', context={
             'posts': posts,
             'tags': tags,
+            'directors': directors,
         })
 
 
@@ -85,14 +87,18 @@ class PostFilterView(View):
 
     def post(self, request, *args, **kwargs):    
         
-        tags_id = request.POST.getlist('filter')
-        posts = Post.objects.filter(tags__id__in=tags_id)
+        dir_id = []
+        tags_id = []
+        for key, value in request.POST.items():
+            # if key.startswith("tag_"): 
+            if 'tag_' in key:
+                tags_id.append(value)
 
-        print('tags_id:', tags_id )
-        print('posts:', posts )
-             
+            elif 'dir_' in key:
+                dir_id.append(value)
 
-
+        posts = Post.objects.filter(tags__id__in=tags_id, directors__id__in=dir_id)
+        
         return render(request, 'index.html', context={
             'posts': posts,
             'tags': Tag.objects.all(),
