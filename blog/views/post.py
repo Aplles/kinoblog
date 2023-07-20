@@ -99,10 +99,14 @@ class PostFilterView(View):
         posts = Post.objects.all()
         if tags_id:
             posts = posts.filter(tags__id__in=tags_id)
+
+        if dir_id:
+            posts = posts.filter(directors__id__in=tags_id)
         
         return render(request, 'index.html', context={
             'posts': posts,
             'tags': Tag.objects.all(),
+            'directors': Director.objects.all(),
         })
 
     
