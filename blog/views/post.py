@@ -85,11 +85,13 @@ class PostFilterView(View):
 
     def post(self, request, *args, **kwargs):    
         
-        tags_id = request.GET.getlist('filter')
+        tags_id = request.POST.getlist('filter')
         posts = Post.objects.filter(tags__id__in=tags_id)
 
         print('tags_id:', tags_id )
         print('posts:', posts )
+             
+
 
         return render(request, 'index.html', context={
             'posts': posts,
