@@ -7,19 +7,17 @@
         <form action="{% url 'filter_by_tag' %}" method="post">
             {% csrf_token %}            
             {% for tag in tags %}
-            <label>
-                <input type="checkbox" name="filter" value="{{tag.id}}">
+            <label for="filter_{{ forloop.counter }}" >
+                <input type="checkbox" id="filter_{{ forloop.counter }}" name="tag_{{forloop.counter}}" value="{{tag.id}}">
                 {{ tag.title }}
             </label>            
             <br>
         {% endfor %}
         <button type="submit">Отфильтровать</button>
-        </form>
-        
+        </form>        
     </div>
 
     <div class="main-container">
-
         <div class="row">
             {% for post in posts %}
                 <div class="col-sm-4">

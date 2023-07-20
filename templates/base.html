@@ -17,6 +17,7 @@
 <header>
     <div>
         <div>КиноБлог</div>
+        <a href="{% url 'index' %}">На главную</a>
     </div>
     <div class="list-links">        
         {% if not request.user.is_authenticated %}
