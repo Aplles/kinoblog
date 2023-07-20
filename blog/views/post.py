@@ -85,7 +85,7 @@ class PostDeleteView(View):
 class PostFilterView(View):
     '''вывод постов по тегу'''
 
-    def post(self, request, *args, **kwargs):    
+    def get(self, request, *args, **kwargs):
         
         dir_id = []
         tags_id = []

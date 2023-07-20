@@ -46,3 +46,12 @@ header {
 .image-post img{
     width: 100%;
 }
+
+.tag_button {
+    background-color: unset;
+    border: none;
+}
+
+.block-tags {
+    display: flex;
+}

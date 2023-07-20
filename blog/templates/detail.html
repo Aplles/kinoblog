@@ -13,7 +13,11 @@
 
     <div class="block-tags">
         {% for tag in post.tags.all %}
-            {{ tag.title }},
+            <form action="{% url 'filter_by_tag' %}" method="get">
+                <div class="block-tag">
+                    <input class="tag_button" type="submit" name="tag_{{ tag.id }}" value="{{ tag.title }}">,
+                </div>
+            </form>
         {% endfor %}
     </div>
     <br>

@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="filters-tags">
-        <form action="{% url 'filter_by_tag' %}" method="post">
+        <form action="{% url 'filter_by_tag' %}" method="get">
             {% csrf_token %}            
             {% for tag in tags %}            
             <label >
