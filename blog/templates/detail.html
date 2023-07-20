@@ -15,7 +15,8 @@
         {% for tag in post.tags.all %}
             <form action="{% url 'filter_by_tag' %}" method="get">
                 <div class="block-tag">
-                    <input class="tag_button" type="submit" name="tag_{{ tag.id }}" value="{{ tag.title }}">,
+                    <input type="hidden" name="tag_{{ tag.id }}" value="{{ tag.id }}">
+                    <input class="tag_button" type="submit" value="{{ tag.title }},">
                 </div>
             </form>
         {% endfor %}
