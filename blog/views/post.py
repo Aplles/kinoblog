@@ -96,8 +96,9 @@ class PostFilterView(View):
 
             elif 'dir_' in key:
                 dir_id.append(value)
-
-        posts = Post.objects.filter(tags__id__in=tags_id, directors__id__in=dir_id)
+        posts = Post.objects.all()
+        if tags_id:
+            posts = posts.filter(tags__id__in=tags_id)
         
         return render(request, 'index.html', context={
             'posts': posts,
