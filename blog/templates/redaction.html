@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Редакстирование поста{% endblock title %}
+
+{% block content %}
+<p>Редактирование поста</p>
+Заголовок:
+<div class="post-title">
+    {{ post.title }}
+</div>
+
+<form action="" method="post">
+    {% csrf_token %}
+
+    <div class="redactor-title">
+        <label for="">Редактируй заголовок</label>
+        <input type="text" id="" name="title_{{ post.id }}" value="{{ post.title }}">
+    </div>
+
+    <div class="redaction-description">
+        <label for="">Редактируй описание</label>
+        <input type="text" id="" name="" value="{{ post.description }}">
+    </div>
+
+    <div class="redaction-year">
+        <label for="">Редактируй год</label>
+        <input type="text" id="" name="" value="{{ post.year }}">
+    </div>
+
+    <div class="redaction-tags">
+        <label for="">Редактируй теги: </label>
+        {% for tag in tags %}
+        <label>
+            {% if tag.is_tagged %}
+                <input type="checkbox" name="tag_{{tag.id}}" value="{{tag.id}}" checked> {{ tag.title }}
+            {% else %}
+                <input type="checkbox" name="tag_{{tag.id}}" value="{{tag.id}}"> {{ tag.title }}
+            {% endif %}
+        </label>
+        {% endfor %}
+    </div>
+
+    <div class="redaction-director">
+        <label for="">Редактируй режиссера: </label>
+        {% for dir in directors %}
+        <label>
+            <input type="checkbox" name="dir_{{dir.id}}" value="{{dir.id}}">
+            {{ dir.first_name }} {{ dir.last_name }}
+        </label>
+        {% endfor %}
+    </div>
+
+    <div class="redaction-published">
+        <select name="status">
+            <option value="DF">Черновик</option>
+            <option value="PB">Опубликовано</option>
+        </select>
+    </div>
+
+
+    <input type="submit" value="Готово">
+</form>
+
+
+{% endblock content %}

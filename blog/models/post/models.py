@@ -30,7 +30,7 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         related_name='posts_author'
     )
-    tags = models.ManyToManyField('Tag', verbose_name='Теги')
+    tags = models.ManyToManyField('Tag', verbose_name='Теги', related_name='posts')
     directors = models.ManyToManyField('Director', verbose_name='Режисcеры')
 
     def image(self):

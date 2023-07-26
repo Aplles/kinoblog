@@ -1,3 +1,4 @@
+from django.db.models import Exists, Count, Q
 from django.shortcuts import render, redirect
 from pytils.translit import slugify
 from django.views import View
@@ -12,9 +13,12 @@ class PostListView(View):
     def get(self, request, *args, **kwargs):
         posts = Post.objects.filter(status=Post.PUBLISHED).order_by(
             '-updated_at')
-        
+
         tags = Tag.objects.all()
         directors = Director.objects.all()
+
+        # print("tags:", tags, "\n")
+        # print("directors:", directors)
 
         return render(request, 'index.html', context={
             'posts': posts,
@@ -56,7 +60,7 @@ class PostCreateView(View):
         post.tags.set(tags)
         post.directors.set(directors)
         return redirect("index")
-    
+
 
 class PostDetailView(View):
     ''' Детальное отображение поста '''
@@ -69,27 +73,79 @@ class PostDetailView(View):
         return render(
             request,
             'detail.html',
-            context={'post':post}
+            context={'post': post}
         )
-    
+
 
 class PostDeleteView(View):
     ''' удаление поста '''
 
     def post(self, request, *args, **kwargs):
-        post = Post.objects.get(id=kwargs['id'])        
+        post = Post.objects.get(id=kwargs['id'])
         post.delete()
         return redirect("index")
-    
+
+
+class PostRedactionView(View):
+    ''' Редактирование поста '''
+
+    def get(self, request, *args, **kwargs):
+        post = Post.objects.get(id=kwargs['id'])
+
+        tags = Tag.objects.annotate(is_tagged=Count('posts', filter=Q(posts__id=post.id))).all()
+        print('[!!!]', tags[0].is_tagged)
+        directors = Director.objects.all()
+
+        # print('self:', self)
+        # print('request:', request)
+        # print('args:', args)
+        # print('kwargs:', kwargs)
+
+        return render(
+            request,
+            'redaction.html',
+            context={
+                'post': post,
+                'tags': tags,
+                'directors': directors
+            }
+        )
+
+    # def post(self, request, *args, **kwargs):
+    #     print('self:', self)
+    #     print('request:', request)
+    #     print('args:', args)
+    #     print('kwargs:', kwargs)
+
+    # #     post = Post.objects.filter(id=kwargs['id'])
+    #     post = Post.objects.filter(id=kwargs['id'])
+    #     return render(
+    #     request,
+    #     'redaction.html',
+    #     context={'posts':post}
+    #     )
+
+    # if request.method == 'POST':
+    #     print('Я здесь')
+
+    # def get(self, request, *args, **kwargs):
+    #         print('self:', self)
+    #         print('request:', request)
+    #         
+
+    # if request.method == 'GET':
+
+    #
+
 
 class PostFilterView(View):
     '''вывод постов по тегу'''
 
     def get(self, request, *args, **kwargs):
-        
+
         dir_id = []
         tags_id = []
-        for key, value in request.POST.items():
+        for key, value in request.GET.items():
             # if key.startswith("tag_"): 
             if 'tag_' in key:
                 tags_id.append(value)
@@ -101,14 +157,10 @@ class PostFilterView(View):
             posts = posts.filter(tags__id__in=tags_id)
 
         if dir_id:
-            posts = posts.filter(directors__id__in=tags_id)
-        
+            posts = posts.filter(directors__id__in=dir_id)
+
         return render(request, 'index.html', context={
             'posts': posts,
             'tags': Tag.objects.all(),
             'directors': Director.objects.all(),
         })
-
-    
-
-

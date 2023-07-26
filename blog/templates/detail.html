@@ -8,10 +8,11 @@
 {% block content %}
     <div class="detail-page">        
         <h4>{{ post.title }}</h4> 
-    </div>
+    </div>   
     <hr>
 
     <div class="block-tags">
+        Теги:
         {% for tag in post.tags.all %}
             <form action="{% url 'filter_by_tag' %}" method="get">
                 <div class="block-tag">
@@ -26,11 +27,12 @@
     <div class="block-directors">                                
         Режиссеры:
         {% for director in post.directors.all %}
-            <h6>
-                {{ director.first_name }} 
-                {{ director.last_name }} 
-                {{ director.country }},
-            </h6>
+            <form action="{% url 'filter_by_tag' %}" method="get">
+                <div class="block-tag">
+                    <input type="hidden" name="dir_{{ director.id }}" value="{{ director.id }}">
+                    <input class="tag_button" type="submit" value="{{ director.first_name }} {{ director.last_name }} {{ director.country }},">
+                </div>
+            </form>            
         {% endfor %}                                 
     </div>
 
@@ -65,14 +67,22 @@
 
     
    
-    {% if request.user.is_staff %}
+    {% if request.user.is_staff %}    
         <div class="form-delete">
             <form action="{% url 'delete_post' post.id %}" method="POST" >
                 {% csrf_token %}
                 <button type="submit">Удалить пост</button>
             </form>
         </div>
+        <hr>
+
+        <!-- редактирование поста -->
+        <div class="redaction">
+            <a href="{% url 'redaction_post' post.id %}">Редактировать</a>
+        </div>
+
     {% endif %}
+    <br>
 
     <div class="block-create-comment">
         <form action="{% url "create_comment" post.slug %}" method="post">

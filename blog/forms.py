@@ -47,6 +47,15 @@ class PostAddForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'input-post-class'}),
         }
 
+
+# class PostRedactionForm(forms.ModelForm):
+#     title = forms.CharField(
+#         max_length=255,
+#         widget=forms.TextInput(attrs={'id': 'textArea', 'class': 'login'})
+#     )
+    
+
+
 # class OrderAddForm(forms.ModelForm):
 #     class Meta:
 #         model = Order
