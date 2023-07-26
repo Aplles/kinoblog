@@ -9,22 +9,22 @@
     {{ post.title }}
 </div>
 
-<form action="" method="post">
+<form action="{% url 'redaction_post' post.id %}" method="post">
     {% csrf_token %}
 
     <div class="redactor-title">
         <label for="">Редактируй заголовок</label>
-        <input type="text" id="" name="title_{{ post.id }}" value="{{ post.title }}">
+        <input type="text" name="title" value="{{ post.title }}">
     </div>
 
     <div class="redaction-description">
         <label for="">Редактируй описание</label>
-        <input type="text" id="" name="" value="{{ post.description }}">
+        <input type="text" name="description" value="{{ post.description }}">
     </div>
 
     <div class="redaction-year">
         <label for="">Редактируй год</label>
-        <input type="text" id="" name="" value="{{ post.year }}">
+        <input type="text" name="year" value="{{ post.year }}">
     </div>
 
     <div class="redaction-tags">
@@ -32,9 +32,9 @@
         {% for tag in tags %}
         <label>
             {% if tag.is_tagged %}
-                <input type="checkbox" name="tag_{{tag.id}}" value="{{tag.id}}" checked> {{ tag.title }}
+            <input type="checkbox" name="tag_{{tag.id}}" value="{{tag.id}}" checked> {{ tag.title }}
             {% else %}
-                <input type="checkbox" name="tag_{{tag.id}}" value="{{tag.id}}"> {{ tag.title }}
+            <input type="checkbox" name="tag_{{tag.id}}" value="{{tag.id}}"> {{ tag.title }}
             {% endif %}
         </label>
         {% endfor %}
@@ -44,16 +44,21 @@
         <label for="">Редактируй режиссера: </label>
         {% for dir in directors %}
         <label>
+            {% if dir.is_director %}
+            <input type="checkbox" name="dir_{{dir.id}}" value="{{dir.id}}" checked>
+            {{ dir.first_name }} {{ dir.last_name }}
+            {% else %}
             <input type="checkbox" name="dir_{{dir.id}}" value="{{dir.id}}">
             {{ dir.first_name }} {{ dir.last_name }}
+            {% endif %}
         </label>
         {% endfor %}
     </div>
 
     <div class="redaction-published">
         <select name="status">
-            <option value="DF">Черновик</option>
             <option value="PB">Опубликовано</option>
+            <option value="DF">Черновик</option>
         </select>
     </div>
 

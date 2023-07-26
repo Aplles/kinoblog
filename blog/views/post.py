@@ -91,16 +91,9 @@ class PostRedactionView(View):
 
     def get(self, request, *args, **kwargs):
         post = Post.objects.get(id=kwargs['id'])
-
-        tags = Tag.objects.annotate(is_tagged=Count('posts', filter=Q(posts__id=post.id))).all()
-        print('[!!!]', tags[0].is_tagged)
-        directors = Director.objects.all()
-
-        # print('self:', self)
-        # print('request:', request)
-        # print('args:', args)
-        # print('kwargs:', kwargs)
-
+        tags = Tag.objects.annotate(is_tagged=Count('posts_tag', filter=Q(posts_tag__id=post.id))).all()
+        directors = Director.objects.annotate(
+            is_director=Count('posts_director', filter=Q(posts_director__id=post.id))).all()
         return render(
             request,
             'redaction.html',
@@ -111,31 +104,51 @@ class PostRedactionView(View):
             }
         )
 
-    # def post(self, request, *args, **kwargs):
-    #     print('self:', self)
-    #     print('request:', request)
-    #     print('args:', args)
-    #     print('kwargs:', kwargs)
+    def post(self, request, *args, **kwargs):
+        post = Post.objects.get(id=kwargs['id'])
+        title = request.POST.get('title')
+        if title:
+            post.title = title
+            post.slug = slugify(title)
+        description = request.POST.get('description')
+        if description:
+            post.description = description
+        year = request.POST.get('year')
+        if year:
+            try:
+                post.year = int(year)
+            except ValueError:
+                ...
+        status = request.POST.get('status')
+        if status:
+            if status == Post.PUBLISHED:
+                post.status = Post.PUBLISHED
+            else:
+                post.status = Post.DRAFT
 
-    # #     post = Post.objects.filter(id=kwargs['id'])
-    #     post = Post.objects.filter(id=kwargs['id'])
-    #     return render(
-    #     request,
-    #     'redaction.html',
-    #     context={'posts':post}
-    #     )
-
-    # if request.method == 'POST':
-    #     print('Я здесь')
-
-    # def get(self, request, *args, **kwargs):
-    #         print('self:', self)
-    #         print('request:', request)
-    #         
-
-    # if request.method == 'GET':
-
-    #
+        directors = []
+        tags = []
+        for key, value in request.POST.items():
+            if 'tag_' in key:
+                try:
+                    tag = Tag.objects.get(id=value)
+                    tags.append(tag)
+                except Tag.DoesNotExist:
+                    ...
+            elif 'dir_' in key:
+                try:
+                    director = Director.objects.get(id=value)
+                    directors.append(director)
+                except Director.DoesNotExist:
+                    ...
+        if tags:
+            post.tags.clear()
+            post.tags.set(tags)
+        if directors:
+            post.directors.clear()
+            post.directors.set(directors)
+        post.save()
+        return redirect(post.get_absolute_url())
 
 
 class PostFilterView(View):
