@@ -7,6 +7,10 @@ from blog.forms import PostAddForm
 from blog.models import Post, Tag, Director
 from django.contrib.auth.models import AnonymousUser
 
+'''
+тестовая запись для github
+'''
+
 
 class PostListView(View):
 
