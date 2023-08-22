@@ -3,9 +3,28 @@
 {% block title %}Создание статьи{% endblock title %}
 
 {% block content %}
-    <form action="{% url 'create' %}" method="post">
+    <form action="{% url 'create' %}" method="post" enctype="multipart/form-data" >
         {% csrf_token %}
         {{ form.as_p }}
+        <h3>Добавьте фото</h3>
+
+        <div>
+            <input name="main_foto" type="radio" value="1" checked >
+            <input type="file" name="foto_1" >
+        </div>
+        <div>
+            <input name="main_foto" type="radio" value="2">
+            <input type="file" name="foto_2">
+        </div>
+        <div>
+            <input name="main_foto" type="radio" value="3">
+            <input type="file" name="foto_3">
+        </div>
+        <div>
+            <input name="main_foto" type="radio" value="4">
+            <input type="file" name="foto_4">
+        </div>
+
         <button type="submit">Создать</button>
     </form>
 {% endblock content %}

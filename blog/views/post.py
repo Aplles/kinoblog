@@ -4,7 +4,7 @@ from pytils.translit import slugify
 from django.views import View
 
 from blog.forms import PostAddForm
-from blog.models import Post, Tag, Director
+from blog.models import Post, Tag, Director, Image
 from django.contrib.auth.models import AnonymousUser
 
 '''
@@ -50,8 +50,14 @@ class PostCreateView(View):
             author=request.user,
             slug=slugify(request.POST['title'])
         )
-        print(request.POST['title'])
-        print(slugify(request.POST['title']))
+
+        index_main_foto = request.POST['main_foto']
+        for name, foto in request.FILES.items():
+            Image.objects.create(
+                image=foto,
+                current=index_main_foto == name[-1],
+                post=post
+            )
 
         tags = [Tag.objects.get(id=tag_id) for tag_id in request.POST.getlist('tags')]
         # tags = []
@@ -98,13 +104,15 @@ class PostRedactionView(View):
         tags = Tag.objects.annotate(is_tagged=Count('posts_tag', filter=Q(posts_tag__id=post.id))).all()
         directors = Director.objects.annotate(
             is_director=Count('posts_director', filter=Q(posts_director__id=post.id))).all()
+        count_new_photo = 4 - post.images.all().count()
         return render(
             request,
             'redaction.html',
             context={
                 'post': post,
                 'tags': tags,
-                'directors': directors
+                'directors': directors,
+                "count_new_photo": count_new_photo
             }
         )
 
@@ -152,6 +160,19 @@ class PostRedactionView(View):
             post.directors.clear()
             post.directors.set(directors)
         post.save()
+
+        current_image_id = request.POST['main_foto']
+        for photo in post.images.all():
+            if int(current_image_id) == photo.id:
+                photo.current = True
+            else:
+                photo.current = False
+            photo.save()
+
+        for key, value in request.FILES.items():
+            image = Image.objects.get(id=key.split("_")[-1])
+            image.image = value
+            image.save()
         return redirect(post.get_absolute_url())
 
 

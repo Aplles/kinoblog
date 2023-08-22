@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.contrib.auth import get_user_model
 
-from blog.models import Post
+from .models import Post
 
 User = get_user_model()
 

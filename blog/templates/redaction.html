@@ -9,7 +9,7 @@
     {{ post.title }}
 </div>
 
-<form action="{% url 'redaction_post' post.id %}" method="post">
+<form action="{% url 'redaction_post' post.id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="redactor-title">
@@ -60,6 +60,21 @@
             <option value="PB">Опубликовано</option>
             <option value="DF">Черновик</option>
         </select>
+    </div>
+
+    <div class="redaction-photo">
+        {% for image in post.images.all %}
+            <div>
+                {% if image.current %}
+                    <input name="main_foto" type="radio" value="{{ image.id }}" checked>
+                {% else %}
+                    <input name="main_foto" type="radio" value="{{ image.id }}">
+                {% endif %}
+                <input type="file" name="foto_{{ image.id }}">
+                <img class="post-photo" src="{{ image.image.url }}" alt="">
+            </div>
+        {% endfor %}
+
     </div>
 
 

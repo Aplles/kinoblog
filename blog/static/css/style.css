@@ -55,3 +55,7 @@ header {
 .block-tags {
     display: flex;
 }
+
+.post-photo {
+width: 50px;
+}
