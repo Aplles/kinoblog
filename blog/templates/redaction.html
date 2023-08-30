@@ -64,15 +64,22 @@
 
     <div class="redaction-photo">
         {% for image in post.images.all %}
-            <div>
-                {% if image.current %}
-                    <input name="main_foto" type="radio" value="{{ image.id }}" checked>
-                {% else %}
-                    <input name="main_foto" type="radio" value="{{ image.id }}">
-                {% endif %}
-                <input type="file" name="foto_{{ image.id }}">
-                <img class="post-photo" src="{{ image.image.url }}" alt="">
-            </div>
+        <div>
+            {% if image.current %}
+            <input name="main_foto" type="radio" value="{{ image.id }}" checked>
+            {% else %}
+            <input name="main_foto" type="radio" value="{{ image.id }}">
+            {% endif %}
+            <input type="file" name="foto_{{ image.id }}">
+            <img class="post-photo" src="{{ image.image.url }}" alt="">
+        </div>
+        {% endfor %}
+
+        {% for index in count_new_photo %}
+        <div>
+            <input name="main_foto" type="radio" value="-{{ index }}">
+            <input type="file" name="foto_-{{ index }}">
+        </div>
         {% endfor %}
 
     </div>

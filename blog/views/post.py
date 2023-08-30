@@ -6,6 +6,7 @@ from django.views import View
 from blog.forms import PostAddForm
 from blog.models import Post, Tag, Director, Image
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 '''
 тестовая запись для github
@@ -96,7 +97,7 @@ class PostDeleteView(View):
         return redirect("index")
 
 
-class PostRedactionView(View):
+class PostRedactionView(LoginRequiredMixin, View):
     ''' Редактирование поста '''
 
     def get(self, request, *args, **kwargs):
@@ -112,26 +113,51 @@ class PostRedactionView(View):
                 'post': post,
                 'tags': tags,
                 'directors': directors,
-                "count_new_photo": count_new_photo
+                "count_new_photo": ''.join([str(i) for i in range(count_new_photo+1, 5)])
             }
         )
 
+    """ Редактирование поста """
     def post(self, request, *args, **kwargs):
+        # по id достаю из БД нужный пост
         post = Post.objects.get(id=kwargs['id'])
+
+        # из запроса получаю title
         title = request.POST.get('title')
+
+        # если title не пустой
         if title:
+            # перезаписываю новый title
             post.title = title
+
+            # записываю новый slug
             post.slug = slugify(title)
+
+        # из запроса достаю description
         description = request.POST.get('description')
+
+        # если  description есть
         if description:
+
+            # в модели поста перезаписываю description
             post.description = description
+
+        # из запроса получаю год
         year = request.POST.get('year')
+
+        # если год есть, перезаписываю его в модели поста, изменив тип данных на число
+        # а если нет????
         if year:
             try:
                 post.year = int(year)
             except ValueError:
                 ...
+
+        # получаю из запроса статус
         status = request.POST.get('status')
+
+        # меняю (если поменялся) в модели поста статус
+        # а если черновик, тогда Что??????
         if status:
             if status == Post.PUBLISHED:
                 post.status = Post.PUBLISHED
@@ -161,18 +187,25 @@ class PostRedactionView(View):
             post.directors.set(directors)
         post.save()
 
-        current_image_id = request.POST['main_foto']
-        for photo in post.images.all():
-            if int(current_image_id) == photo.id:
-                photo.current = True
-            else:
-                photo.current = False
-            photo.save()
+        # current_image_id = request.POST['main_foto'] # 27 или -3  id или index
+        # if current_image_id < 0:
+        #     Image.objects.create(
+        #         image=,
+        #         current=
+        #         post=post
+        #     )
 
-        for key, value in request.FILES.items():
-            image = Image.objects.get(id=key.split("_")[-1])
-            image.image = value
-            image.save()
+        # for photo in post.images.all():
+        #     if int(current_image_id) == photo.id:
+        #         photo.current = True
+        #     else:
+        #         photo.current = False
+        #     photo.save()
+        #
+        # for key, value in request.FILES.items():
+        #     image = Image.objects.get(id=key.split("_")[-1])
+        #     image.image = value
+        #     image.save()
         return redirect(post.get_absolute_url())
 
 
