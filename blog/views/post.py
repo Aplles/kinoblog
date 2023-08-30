@@ -105,7 +105,6 @@ class PostRedactionView(LoginRequiredMixin, View):
         tags = Tag.objects.annotate(is_tagged=Count('posts_tag', filter=Q(posts_tag__id=post.id))).all()
         directors = Director.objects.annotate(
             is_director=Count('posts_director', filter=Q(posts_director__id=post.id))).all()
-        count_new_photo = 4 - post.images.all().count()
         return render(
             request,
             'redaction.html',
@@ -113,13 +112,15 @@ class PostRedactionView(LoginRequiredMixin, View):
                 'post': post,
                 'tags': tags,
                 'directors': directors,
-                "count_new_photo": ''.join([str(i) for i in range(count_new_photo+1, 5)])
+                "count_new_photo": ''.join([str(i) for i in range(post.images.all().count() + 1, 5)])
             }
         )
 
     """ Редактирование поста """
+
     def post(self, request, *args, **kwargs):
         # по id достаю из БД нужный пост
+        global post
         post = Post.objects.get(id=kwargs['id'])
 
         # из запроса получаю title
@@ -138,7 +139,6 @@ class PostRedactionView(LoginRequiredMixin, View):
 
         # если  description есть
         if description:
-
             # в модели поста перезаписываю description
             post.description = description
 
@@ -187,25 +187,43 @@ class PostRedactionView(LoginRequiredMixin, View):
             post.directors.set(directors)
         post.save()
 
-        # current_image_id = request.POST['main_foto'] # 27 или -3  id или index
-        # if current_image_id < 0:
-        #     Image.objects.create(
-        #         image=,
-        #         current=
-        #         post=post
-        #     )
-
-        # for photo in post.images.all():
-        #     if int(current_image_id) == photo.id:
-        #         photo.current = True
-        #     else:
-        #         photo.current = False
-        #     photo.save()
-        #
-        # for key, value in request.FILES.items():
-        #     image = Image.objects.get(id=key.split("_")[-1])
-        #     image.image = value
-        #     image.save()
+        current_image_id = int(request.POST['main_foto'])  # 3 или -2  id или index
+        if current_image_id < 0:  # Пришел index
+            for photo in post.images.all():
+                photo.current = False
+                photo.save()
+            for key, value in request.FILES.items():
+                # key = foto_-2  [foto, '-2']
+                if current_image_id == int(key.split("_")[-1]):
+                    Image.objects.create(
+                        image=value,
+                        current=True,
+                        post=post
+                    )
+                else:
+                    Image.objects.create(
+                        image=value,
+                        current=False,
+                        post=post
+                    )
+        else:  # Пришел id
+            for photo in post.images.all():
+                if current_image_id == photo.id:
+                    photo.current = True
+                else:
+                    photo.current = False
+                photo.save()
+            for key, value in request.FILES.items():
+                try:
+                    image = Image.objects.get(id=key.split("_")[-1])
+                    image.image = value
+                    image.save()
+                except Image.DoesNotExist:
+                    Image.objects.create(
+                        image=value,
+                        current=False,
+                        post=post
+                    )
         return redirect(post.get_absolute_url())
 
 
