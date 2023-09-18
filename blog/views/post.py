@@ -136,7 +136,6 @@ class PostRedactionView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         # по id достаю из БД нужный пост
-        global post
         post = Post.objects.get(id=kwargs['id'])
 
         # из запроса получаю title

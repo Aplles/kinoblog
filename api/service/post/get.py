@@ -1,5 +1,4 @@
 from functools import lru_cache
-
 from service_objects.services import Service
 from django import forms
 from blog.models import Post
@@ -38,17 +37,4 @@ class PostDetailService(Service):
                 }
             )
 
-    # @property
-    # @lru_cache
-    # def _post(self) -> Post:
-    #     return Post.objects.get(id=self.cleaned_data['id'])
-    #
-    # def check_post_id(self):
-    #     try:
-    #         post = self._post
-    #     except Post.DoesNotExist as ex:
-    #         raise NotFound(
-    #             {
-    #                 "error": "Post matching query does not exist."
-    #             }
-    #         )
+

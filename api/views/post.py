@@ -7,6 +7,7 @@ from api.serializers.director.list import DirectorListSerializer
 from api.serializers.tag.list import TagListSerializer
 from api.service.post.create import PostCreateService
 from api.service.post.get import PostDetailService
+from api.service.post.delete import PostDeleteService
 
 
 class PostListView(APIView):
@@ -35,3 +36,8 @@ class PostDetailUpdateDestroyView(APIView):
         return Response(
             PostSerializer(outcome.result).data
         )
+
+    def delete(self, request, *args, **kwargs):
+        kwargs.update({"user": request.user})
+        outcome = PostDeleteService.execute(kwargs)
+
