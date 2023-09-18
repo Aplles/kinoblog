@@ -6,7 +6,7 @@ from api.serializers.post.list import PostSerializer
 from api.serializers.director.list import DirectorListSerializer
 from api.serializers.tag.list import TagListSerializer
 from api.service.post.create import PostCreateService
-from service.post.get import PostDetailService
+from api.service.post.get import PostDetailService
 
 
 class PostListView(APIView):
