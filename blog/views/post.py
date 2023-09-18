@@ -7,6 +7,7 @@ from blog.forms import PostAddForm
 from blog.models import Post, Tag, Director, Image
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 '''
 тестовая запись для github
@@ -23,7 +24,22 @@ class PostListView(View):
         directors = Director.objects.all()
 
         # print("tags:", tags, "\n")
-        # print("directors:", directors)
+        # print("directors:", directors)\
+
+        # пагинация
+        # экземпляр класса Paginator с числом объектов, возвращаемых на страницу
+        paginator = Paginator(posts, 6)
+        page_number = request.GET.get('page', 1)
+        try:
+            posts = paginator.page(page_number)
+
+        # если вызванная страница не int, выдать первую
+        except PageNotAnInteger:
+            posts = paginator.page(1)
+
+        # если вызванная страница вне диапазона, выдать последнюю
+        except EmptyPage:
+            posts = paginator.page(paginator.num_pages)
 
         return render(request, 'index.html', context={
             'posts': posts,
@@ -146,7 +162,7 @@ class PostRedactionView(LoginRequiredMixin, View):
         year = request.POST.get('year')
 
         # если год есть, перезаписываю его в модели поста, изменив тип данных на число
-        # а если нет????
+        # а если нет или строка, то год не запишется
         if year:
             try:
                 post.year = int(year)
@@ -166,6 +182,8 @@ class PostRedactionView(LoginRequiredMixin, View):
 
         directors = []
         tags = []
+        # выдергиваю все id тегов у поста, записываю их в список
+        # когда я провалюсь в except??????
         for key, value in request.POST.items():
             if 'tag_' in key:
                 try:
@@ -173,12 +191,14 @@ class PostRedactionView(LoginRequiredMixin, View):
                     tags.append(tag)
                 except Tag.DoesNotExist:
                     ...
+            # Выдергиваю все id режиссеров, записываю их в список
             elif 'dir_' in key:
                 try:
                     director = Director.objects.get(id=value)
                     directors.append(director)
                 except Director.DoesNotExist:
                     ...
+        # если список с тегами не пустой, очищаю в БД теги, предыдущие теги, устанавливаю новые
         if tags:
             post.tags.clear()
             post.tags.set(tags)
@@ -187,26 +207,29 @@ class PostRedactionView(LoginRequiredMixin, View):
             post.directors.set(directors)
         post.save()
 
-        current_image_id = int(request.POST['main_foto'])  # 3 или -2  id или index
-        if current_image_id < 0:  # Пришел index
+        current_image_id = int(request.POST['main_foto'])  # 3 или -2, id или index
+
+        if current_image_id < 0:  # если пришел index (они отрицательные)
             for photo in post.images.all():
-                photo.current = False
+                photo.current = False # удаляю предыдущую отметку "Основное фото"
                 photo.save()
             for key, value in request.FILES.items():
                 # key = foto_-2  [foto, '-2']
+                # если индекс и foto_index совпали, то фото запишем основным
                 if current_image_id == int(key.split("_")[-1]):
                     Image.objects.create(
                         image=value,
-                        current=True,
+                        current=True, # основное
                         post=post
                     )
+                # если индекс и foto_index НЕ совпали, то фото не основное
                 else:
                     Image.objects.create(
                         image=value,
-                        current=False,
+                        current=False, # не основное
                         post=post
                     )
-        else:  # Пришел id
+        else:  # Пришел id (фото уже были записаны раньше в БД)
             for photo in post.images.all():
                 if current_image_id == photo.id:
                     photo.current = True
@@ -214,6 +237,7 @@ class PostRedactionView(LoginRequiredMixin, View):
                     photo.current = False
                 photo.save()
             for key, value in request.FILES.items():
+                # если при итерации пар попадется индекс (он отрицательный!)
                 try:
                     image = Image.objects.get(id=key.split("_")[-1])
                     image.image = value

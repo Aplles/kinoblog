@@ -67,11 +67,15 @@
         <div>
             {% if image.current %}
             <input name="main_foto" type="radio" value="{{ image.id }}" checked>
+            --> redaction-foto cheked
             {% else %}
             <input name="main_foto" type="radio" value="{{ image.id }}">
+            --> redaction-foto второй input
             {% endif %}
             <input type="file" name="foto_{{ image.id }}">
+            --> а это где???
             <img class="post-photo" src="{{ image.image.url }}" alt="">
+            --> redaction-foto endif
         </div>
         {% endfor %}
 
@@ -79,6 +83,7 @@
         <div>
             <input name="main_foto" type="radio" value="-{{ index }}">
             <input type="file" name="foto_-{{ index }}">
+            --> второй div с минусовыми индексами
         </div>
         {% endfor %}
 
