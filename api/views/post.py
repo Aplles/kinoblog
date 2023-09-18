@@ -40,4 +40,7 @@ class PostDetailUpdateDestroyView(APIView):
     def delete(self, request, *args, **kwargs):
         kwargs.update({"user": request.user})
         outcome = PostDeleteService.execute(kwargs)
+        return Response({
+            'info': f'Post with {kwargs["id"]} successful deleted'
+        })
 
