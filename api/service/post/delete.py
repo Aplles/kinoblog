@@ -35,6 +35,6 @@ class PostDeleteService(Service):
         if not self.cleaned_data["user"].is_superuser:
             raise PermissionDenied(
                 {
-                    "error": "Создавать пост, может superuser."
+                    "error": "Удалять пост, может superuser."
                 }
             )
