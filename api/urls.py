@@ -1,6 +1,6 @@
 from django.urls import path
 from api.views.post import PostListView, PostDetailUpdateDestroyView
-from views.user import UserLoginView, UserCreateView
+from api.views.user import UserLoginView, UserCreateView
 
 urlpatterns = [
     path('posts/', PostListView.as_view()), # Просмотр постов, просмотр отфильтрованных, создание постов

@@ -6,17 +6,16 @@ from api.service.post.get import PostDetailService
 from functools import lru_cache
 from blog.models import User, Tag, Director, Image, Post
 from pytils.translit import slugify
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from pytils.translit import slugify
 
 """ Сервис редактирования поста """
 
 
 class PostUpdateService(Service):
-    title = forms.CharField(required=False)  # будет в cleaned data, required=False-необязательный аргумент
+    title = forms.CharField(required=False)
     description = forms.CharField(required=False)
-    year = forms.CharField(
-        required=False)  # integerfield не пошло, прилож drf не пропускает, буду конвертировать внутри сервиса
+    year = forms.CharField(required=False)
     status = forms.CharField(required=False)
     main_foto = forms.CharField(required=False)
     tags = forms.CharField(required=False)
@@ -27,6 +26,8 @@ class PostUpdateService(Service):
     custom_validations = [
         'check_year',
         'check_status',
+        'check_tags',
+        'check_directors',
     ]
 
     def run_custom_validations(self):
@@ -47,8 +48,33 @@ class PostUpdateService(Service):
         if self.cleaned_data['title']:
             post.slug = slugify(self.cleaned_data['title'])
         post.save()
-        post.tags.set()
+
+        if self.cleaned_data['tags']:
+            post.tags.clear()
+            post.tags.set(self._tags)
+        if self.cleaned_data['directors']:
+            post.directors.clear()
+            post.directors.set(self._directors)
+
         return post
+
+    @property
+    @lru_cache
+    def _tags(self) -> list:
+        return [
+            Tag.objects.get(id=tag_id)
+            for tag_id in self.cleaned_data['tags'].split(',')  # Генератор списка с условием
+            if tag_id
+        ]
+
+    @property
+    @lru_cache
+    def _directors(self) -> list:
+        return [
+            Director.objects.get(id=director_id)
+            for director_id in self.cleaned_data['directors'].split(',')
+            if director_id
+        ]
 
     @property
     @lru_cache
@@ -71,5 +97,25 @@ class PostUpdateService(Service):
             raise ValidationError(
                 {
                     "error": "Значение status должно быть PB or DF. "
+                }
+            )
+
+    def check_directors(self) -> None:
+        """ Валидация директоров """
+        try:
+            directors = self._directors
+        except Director.DoesNotExist:
+            raise ValidationError(
+                {
+                    "error": "Нет такого режиссера в Базе данных."
+                }
+            )
+
+    def check_user(self):
+        """ Проверка на суперюзера """
+        if not self.cleaned_data["user"].is_superuser:
+            raise PermissionDenied(
+                {
+                    "error": "Создавать пост, может superuser."
                 }
             )
