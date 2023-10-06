@@ -2,12 +2,12 @@ from django.db.models import Exists, Count, Q
 from django.shortcuts import render, redirect
 from pytils.translit import slugify
 from django.views import View
-
 from blog.forms import PostAddForm
 from blog.models import Post, Tag, Director, Image
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from api.service.post.filter import PostFilterService
 
 '''
 тестовая запись для github
@@ -252,27 +252,10 @@ class PostRedactionView(LoginRequiredMixin, View):
 
 class PostFilterView(View):
     '''вывод постов по тегу'''
-
     def get(self, request, *args, **kwargs):
-
-        dir_id = []
-        tags_id = []
-        for key, value in request.GET.items():
-            # if key.startswith("tag_"): 
-            if 'tag_' in key:
-                tags_id.append(value)
-
-            elif 'dir_' in key:
-                dir_id.append(value)
-        posts = Post.objects.all()
-        if tags_id:
-            posts = posts.filter(tags__id__in=tags_id)
-
-        if dir_id:
-            posts = posts.filter(directors__id__in=dir_id)
-
+        outcome = PostFilterService.execute(request.GET)
         return render(request, 'index.html', context={
-            'posts': posts,
+            'posts': outcome.result,
             'tags': Tag.objects.all(),
             'directors': Director.objects.all(),
         })

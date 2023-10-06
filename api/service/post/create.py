@@ -6,6 +6,8 @@ from service_objects.fields import ModelField
 from functools import lru_cache
 from rest_framework.exceptions import ValidationError, PermissionDenied
 
+""" Сервис создания поста поста """
+
 
 class PostCreateService(Service):
     title = forms.CharField(required=False)  # будет в cleaned data, required=False-необязательный аргумент
@@ -25,7 +27,7 @@ class PostCreateService(Service):
         'check_photo',
         'check_year',
         'check_directors',
-        'check_user'
+        'check_user',
     ]
     def run_custom_validations(self):
         for custom_validation in self.custom_validations:
@@ -164,8 +166,9 @@ class PostCreateService(Service):
                     "error": "Нет такого режиссера в Базе данных."
                 }
             )
+
     def check_user(self):
-        """ проверка на суперюзера """
+        """ Проверка на суперюзера"""
         if not self.cleaned_data["user"].is_superuser:
             raise PermissionDenied(
                 {

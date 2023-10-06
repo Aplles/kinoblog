@@ -4,7 +4,7 @@ from .models import Post, Tag, Director, Image, Comment, User
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'author', 'updated_at']
+    list_display = ['title', 'slug', 'author', 'updated_at', 'id']
     list_filter = ['status', 'author', 'updated_at']
     search_fields = ['title', 'description']
     prepopulated_fields = {'slug': ('title',)}
