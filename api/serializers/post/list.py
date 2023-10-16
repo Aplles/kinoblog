@@ -8,7 +8,7 @@ from api.serializers.user.show import UserShowSerializer
 
 class PostSerializer(serializers.ModelSerializer):
     tags = TagListSerializer(read_only=True, many=True)
-    directors = DirectorListSerializer(read_only=True, many=True)
+    directors = DirectorListSerializer(read_only=True, many=True) # read_only=True-только для чтения, many=True-тк сериализую List(много сериалайзеров)
     images = ImageListSerializer(read_only=True, many=True)
     author = UserShowSerializer(read_only=True) # Show or Get показать одного пользователя (many=True НЕТ)
 
@@ -16,7 +16,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         # fields = "__all__"
-        fields = (
+        fields = ( # Если нужно просериализовать конкретное поле (images), то all, не подходит, нужно прописать конкретные поля
             "id",
             "title",
             "slug",
