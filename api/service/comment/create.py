@@ -6,8 +6,9 @@ from rest_framework.exceptions import ValidationError
 from api.service.post.get import PostDetailService
 from functools import lru_cache
 
-
 """ Сервис создания комментария """
+
+
 class CommentCreateServece(Service):
     author = ModelField(User)
     title = forms.CharField(required=False)
@@ -15,14 +16,13 @@ class CommentCreateServece(Service):
 
     custom_validations = [
         'check_title',
-        '_post',
-        # 'check_len_title',
+        'check_post',
+        'check_len_title',
     ]
 
     def run_custom_validations(self):
         for custom_validation in self.custom_validations:
             getattr(self, custom_validation)()
-
 
     def process(self):
         self.run_custom_validations()
@@ -37,6 +37,12 @@ class CommentCreateServece(Service):
         if title:
             return Comment.objects.create(title=title, author=author, post=post)
 
+    @property
+    @lru_cache
+    def _post(self):
+        # Получаю экземпляр класса, воспользовавшись сервисом детального получения
+        return PostDetailService.execute(self.cleaned_data).result
+
     def check_title(self):
         if not self.cleaned_data['title']:
             raise ValidationError(
@@ -45,13 +51,13 @@ class CommentCreateServece(Service):
                 }
             )
 
-    @property
-    @lru_cache
-    def _post(self):
-        # Получаю экземпляр класса, воспользовавшись сервисом детального получения
-        return PostDetailService.execute(self.cleaned_data).result
-
+    def check_post(self):
+        return self._post
 
     def check_len_title(self):
         if len(self.cleaned_data['title']) > 255:
-            ...
+            raise ValidationError(
+                {
+                    "error": "Комментарий не должен больше 255 символов."
+                }
+            )
