@@ -87,7 +87,7 @@ class PostUpdateService(Service):
 
     def check_directors(self) -> None:
         """
-        Вывод ошибку, если id директора, нет в БД
+        Вывод ошибки, если id директора, нет в БД
         Обращается к _directors (поиск по id в БД), выводит ошибку
         если такого директора нет
         """
@@ -157,6 +157,7 @@ class PostUpdateService(Service):
             )
 
     def update_photo(self):
+        ''' Обновление фотографий. Все предыдущие удаляются! '''
         if not self.files:
             return
         Image.objects.filter(post=self._post).delete()

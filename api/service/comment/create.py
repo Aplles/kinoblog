@@ -9,7 +9,7 @@ from functools import lru_cache
 """ Сервис создания комментария """
 
 
-class CommentCreateServece(Service):
+class CommentCreateService(Service):
     author = ModelField(User)
     title = forms.CharField(required=False)
     id = forms.IntegerField()
@@ -30,20 +30,25 @@ class CommentCreateServece(Service):
         return self
 
     def _comment(self):
-        title = self.cleaned_data['title']
-        author = self.cleaned_data['author']
-        post = Post.objects.get(id=self.cleaned_data['id'])
-
-        if title:
-            return Comment.objects.create(title=title, author=author, post=post)
+        ''' Создание коммента '''
+        return Comment.objects.create(
+            title=self.cleaned_data['title'],
+            author=self.cleaned_data['author'],
+            post=self._post
+        )
 
     @property
     @lru_cache
     def _post(self):
-        # Получаю экземпляр класса, воспользовавшись сервисом детального получения
+        '''
+        Активируется фу-ей check_post.
+        Получает экземпляр класса, воспользовавшись сервисом детального
+        получения
+        '''
         return PostDetailService.execute(self.cleaned_data).result
 
     def check_title(self):
+        ''' Проверка, что title не пустой '''
         if not self.cleaned_data['title']:
             raise ValidationError(
                 {
@@ -52,9 +57,11 @@ class CommentCreateServece(Service):
             )
 
     def check_post(self):
+        ''' Проверка существования поста '''
         return self._post
 
     def check_len_title(self):
+        ''' Ограничивает длину комментария '''
         if len(self.cleaned_data['title']) > 255:
             raise ValidationError(
                 {

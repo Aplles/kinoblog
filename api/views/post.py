@@ -35,7 +35,7 @@ class PostListView(APIView):
 
 class PostDetailUpdateDestroyView(APIView):
     def get(self, request, *args, **kwargs):
-        """ Детальный просмотр поста """
+        """ Детальный просмотр поста, удаление, частичное обновление (редактирование) """
         outcome = PostDetailService.execute(kwargs)
         return Response(
             PostSerializer(outcome.result).data

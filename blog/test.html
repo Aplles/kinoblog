@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test jquery</title>
+</head>
+<body>
+<button> Это кнопка </button>
+
+<h1> Это body !!!</h1>
+
+<!--Подключаю библиотеку jQuery -->
+<script src="/templates/jquery/jquery-3.7.1.js"></script>
+
+<!--по клику по кнопке заголовак уйдет -->
+<script>
+    $(document).ready(function() {
+        $("button").on("click", function() {
+        $("h1").hide(3000);
+        });
+    });
+</script>
+
+</body>
+</html>

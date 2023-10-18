@@ -11,6 +11,7 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.title
+        # return f"{self.title} {self.created_at} {self.author}"
     
     class Meta:
         db_table = 'comments'

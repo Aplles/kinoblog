@@ -4,6 +4,7 @@ from api.serializers.tag.list import TagListSerializer
 from api.serializers.director.list import DirectorListSerializer
 from api.serializers.image.list import ImageListSerializer
 from api.serializers.user.show import UserShowSerializer
+from api.serializers.comment.list import CommentlistSerializer
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -11,6 +12,7 @@ class PostSerializer(serializers.ModelSerializer):
     directors = DirectorListSerializer(read_only=True, many=True) # read_only=True-только для чтения, many=True-тк сериализую List(много сериалайзеров)
     images = ImageListSerializer(read_only=True, many=True)
     author = UserShowSerializer(read_only=True) # Show or Get показать одного пользователя (many=True НЕТ)
+    comments = CommentlistSerializer("comments_post", read_only=True, many=True)
 
 
     class Meta:
@@ -28,4 +30,5 @@ class PostSerializer(serializers.ModelSerializer):
             "tags",
             "directors",
             "images",
+            "comments"
         )
