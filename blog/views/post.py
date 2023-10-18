@@ -2,6 +2,8 @@ from django.db.models import Exists, Count, Q
 from django.shortcuts import render, redirect
 from pytils.translit import slugify
 from django.views import View
+from rest_framework.authtoken.models import Token
+
 from blog.forms import PostAddForm
 from blog.models import Post, Tag, Director, Image
 from django.contrib.auth.models import AnonymousUser
@@ -97,10 +99,15 @@ class PostDetailView(View):
             return redirect("index")
 
         post = Post.objects.get(slug=kwargs['slug_post'])
+
+        context = {'post': post}
+        if not isinstance(request.user, AnonymousUser):
+            context['token'] = Token.objects.get(user=request.user).key
+
         return render(
             request,
             'detail.html',
-            context={'post': post}
+            context=context
         )
 
 

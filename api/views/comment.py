@@ -16,7 +16,7 @@ class CommentListView(APIView):
         """ Создание комментария"""
         # Если request.POST принадлежит к типу QueryDict - делаем из него словарь
         # в противном случае оставляем без изменений
-        data = request.POST.dict() if isinstance(request.POST, QueryDict) else request.POST
+        data = request.data.dict() if isinstance(request.data, QueryDict) else request.data
         # Обновляю data автором и id-ником
         data.update({"author": request.user}, **kwargs)
         outcome = CommentCreateService.execute(data)

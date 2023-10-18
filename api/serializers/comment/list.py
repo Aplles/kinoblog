@@ -1,15 +1,18 @@
 from rest_framework import serializers
+
+from api.serializers.user.show import UserShowSerializer
 from blog.models import Comment
 
 
 class CommentlistSerializer(serializers.ModelSerializer):
+    author = UserShowSerializer(read_only=True)
 
     class Meta:
         model = Comment
-        fields = "__all__"
-        # fields = (
-        #     "title",
-        #     "author",
-        #     "post",
-        #     "created_at",
-        # )
+        fields = (
+            "id",
+            "title",
+            "author",
+            "post",
+            "created_at",
+        )

@@ -3,6 +3,11 @@ body {
     margin: 0 !important;
 }
 
+p {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 header {
     padding: 20px;
     display: flex !important;
@@ -58,4 +63,17 @@ header {
 
 .post-photo {
 width: 50px;
+}
+
+.comment-display {
+    margin: 10px 0;
+    border: 1px solid gray;
+    padding: 10px;
+    border-radius: 15px;
+}
+
+.title-comment {
+    margin-left: 10px;
+    font-size: 20px;
+    margin-top: 10px;
 }

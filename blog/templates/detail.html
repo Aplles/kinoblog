@@ -6,9 +6,9 @@
 {% endblock title %}
 
 {% block content %}
-    <div class="detail-page">        
-        <h4>{{ post.title }}</h4> 
-    </div>   
+    <div class="detail-page">
+        <h4>{{ post.title }}</h4>
+    </div>
     <hr>
 
     <div class="block-tags">
@@ -24,16 +24,17 @@
     </div>
     <br>
 
-    <div class="block-directors">                                
+    <div class="block-directors">
         Режиссеры:
         {% for director in post.directors.all %}
             <form action="{% url 'filter_by_tag' %}" method="get">
                 <div class="block-tag">
                     <input type="hidden" name="dir_{{ director.id }}" value="{{ director.id }}">
-                    <input class="tag_button" type="submit" value="{{ director.first_name }} {{ director.last_name }} {{ director.country }},">
+                    <input class="tag_button" type="submit"
+                           value="{{ director.first_name }} {{ director.last_name }} {{ director.country }},">
                 </div>
-            </form>            
-        {% endfor %}                                 
+            </form>
+        {% endfor %}
     </div>
 
     <div class="block-year">
@@ -43,7 +44,7 @@
         </h6>
     </div>
 
-    <div class="author">        
+    <div class="author">
         <h6>Автор: {{ post.author }}</h6>
     </div>
     <br>
@@ -51,8 +52,8 @@
     <div class="created-at">
         Дата создания:
         <h6>
-            {{ post.updated_at}}
-        </h6> 
+            {{ post.updated_at }}
+        </h6>
     </div>
 
     <div class="block-images">
@@ -62,14 +63,14 @@
     </div>
 
     <div class="block-description">
-        <p><h5>{{ post.description }}</h5></p>        
+        <p><h5>{{ post.description }}</h5></p>
     </div>
 
-    
-   
-    {% if request.user.is_staff %}    
+
+
+    {% if request.user.is_staff %}
         <div class="form-delete">
-            <form action="{% url 'delete_post' post.id %}" method="POST" >
+            <form action="{% url 'delete_post' post.id %}" method="POST">
                 {% csrf_token %}
                 <button type="submit">Удалить пост</button>
             </form>
@@ -85,35 +86,102 @@
     <br>
 
     <div class="block-create-comment">
-        <form action="{% url "create_comment" post.slug %}" method="post">
-            {% csrf_token %}
-                <div class="comment">
-                    <textarea name="text_comment"  cols="30" rows="2"></textarea>
-                </div>
-                {% if request.user.is_authenticated %}
-                    <button type="submit">Добавить комментарий</button>                 
-                {% else %}
-                    <div class="link-item"><a href="{% url 'login' %}">Авторизируйтесь</a></div>
-                {% endif %}
-        </form>
+        <input type="text" id="title_comment">
+        {% if request.user.is_authenticated %}
+            <button id="add_comment" type="submit">Добавить комментарий</button>
+        {% else %}
+            <div class="link-item"><a href="{% url 'login' %}">Авторизируйтесь</a></div>
+        {% endif %}
+        <p style="color: red" id="error"></p>
     </div>
 
     <div class="error">
-        {{error}}
+        {{ error }}
     </div>
-    
-    <div class="comment">
+
+    <div id="div_comments" class="comment">
         {% for comment in post.comments_post.all %}
             <div class="comment-display">
-                {{comment.author}}
-                {{comment.created_at}}
-                {{comment.title}}
+                {{ comment.author }}
+                {{ comment.created_at }}
+                <div class="title-comment">
+                    <p>{{ comment.title }}</p>
+                </div>
             </div>
         {% endfor %}
     </div>
 
 
-<!--Подключаю библиотеку jQuery -->
-<script src="{% static 'jquery/jquery-3.7.1.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            function getCookie(c_name) {
+                if (document.cookie.length > 0) {
+                    c_start = document.cookie.indexOf(c_name + "=");
+                    if (c_start !== -1) {
+                        c_start = c_start + c_name.length + 1;
+                        c_end = document.cookie.indexOf(";", c_start);
+                        if (c_end === -1) c_end = document.cookie.length;
+                        return unescape(document.cookie.substring(c_start, c_end));
+                    }
+                }
+                return "";
+            }
+
+            $.ajaxSetup({
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Authorization": "Token {{ token }}",
+                }
+            });
+
+            function get_data(inputDate) {
+                let date = new Date(inputDate);
+                let months = [
+                    "января",
+                    "февраля",
+                    "марта",
+                    "апреля",
+                    "мая",
+                    "июня",
+                    "июля",
+                    "августа",
+                    "сентября",
+                    "октября",
+                    "ноября",
+                    "декабря"
+                ];
+                return date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear() + " г. " + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+            }
+
+            $(document).on('click', '#add_comment', function (e) {
+                {# Зона Ajax #}
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'create_comment' post.id %}",
+                    data: JSON.stringify({
+                        title: $("#title_comment").val()
+                    }),
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (response) {
+                        $("#div_comments").append(`
+                            <div class='comment-display'>
+                            ${response.author.username} ${get_data(response.created_at)}
+                            <div class="title-comment"><p>${response.title}</p></div>
+                            </div>`
+                        )
+                        $("#title_comment").val("");
+                    },
+                    error: function (response) {
+                        $("#error").html("Комментарий не может быть пустым");
+                        console.log(response);
+                    }
+                });
+                return false;
+                {# Конец зоны #}
+            });
+        });
+    </script>
+
 {% endblock content %}
 
