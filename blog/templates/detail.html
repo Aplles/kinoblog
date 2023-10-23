@@ -152,9 +152,7 @@
                 ];
                 return date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear() + " г. " + date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
             }
-
-            $(document).on('click', '#add_comment', function (e) {
-                {# Зона Ajax #}
+            $(document).on('click', '#add_comment', function (e){
                 $.ajax({
                     type: "POST",
                     url: "{% url 'create_comment' post.id %}",
@@ -168,18 +166,19 @@
                             <div class='comment-display'>
                             ${response.author.username} ${get_data(response.created_at)}
                             <div class="title-comment"><p>${response.title}</p></div>
-                            </div>`
-                        )
+                            </div>`                        )
                         $("#title_comment").val("");
+                        $("#error").html("");
+
                     },
                     error: function (response) {
                         $("#error").html("Комментарий не может быть пустым");
-                        console.log(response);
-                    }
+                    },
                 });
                 return false;
-                {# Конец зоны #}
             });
+
+
         });
     </script>
 
